@@ -16,7 +16,16 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/hello_world" />
+        android:text="@string/hello_world"
+        android:textSize="20sp"
+        android:layout_marginBottom="5dip" />
+
+    <Button
+        android:id="@+id/bntAnterior"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/previous"
+        android:textSize="12sp"/>
 
     <ImageView
         android:id="@+id/imagen"
