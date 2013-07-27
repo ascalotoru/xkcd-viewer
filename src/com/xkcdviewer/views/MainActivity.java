@@ -21,6 +21,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -33,9 +35,12 @@ public class MainActivity extends Activity {
 	private ProgressDialog pDialog;
 	private ImageView image;
 	private TextView title;
+	private Button btnPrevious;
 	private URL url;
 	
 	private static String LAST_COMIC_URL = "http://xkcd.com/info.0.json";
+	private JSONParser jsonParser;
+	private int currentComic;
 	private Comic comic;
 	private JSONArray comics;
 	private JSONObject json;
@@ -59,13 +64,14 @@ public class MainActivity extends Activity {
         image = (ImageView) findViewById(R.id.imagen);
         title = (TextView) findViewById(R.id.title);
         pbarProgreso = (ProgressBar)findViewById(R.id.pbarProgreso);
+        btnPrevious = (Button) findViewById(R.id.bntAnterior);
         
         pDialog = new ProgressDialog(MainActivity.this);
         pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         pDialog.setMessage("Procesando...");
         pDialog.setMax(100);
         
-        JSONParser jsonParser = new JSONParser(this.getApplicationContext());
+        jsonParser = new JSONParser(this.getApplicationContext());
         try {
 			json = jsonParser.execute(LAST_COMIC_URL).get();
 		} catch (InterruptedException e1) {
@@ -77,25 +83,20 @@ public class MainActivity extends Activity {
 		}
         
         try{
-        	comic = new Comic(json.getString(TAG_MONTH), json.getString(TAG_NUM),
-        			json.getString(TAG_LINK), json.getString(TAG_YEAR), 
-        			json.getString(TAG_NEWS), json.getString(TAG_SAFE_TITLE), 
-        			json.getString(TAG_TRANSCRIPT), json.getString(TAG_ALT), 
-        			json.getString(TAG_IMG), json.getString(TAG_TITLE), 
-        			json.getString(TAG_DAY));
+        	extractJSONData(json);
         }catch (JSONException e) {
 			Log.e(this.LOG_TAG, "Error extracting data " + e.toString());
 		}
         
 		try {
-			url = new URL(comic.getImg());
-			Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-	        image.setImageBitmap(bmp);
-	        title.setText(comic.getTitle());
+			printTheData();
 		} catch (MalformedURLException e) {
 			Log.e(this.LOG_TAG, "Error getting the image " + e.toString());
 		} catch (IOException e) {
 			Log.e(this.LOG_TAG, "Error getting the image " + e.toString());
+		} catch (NumberFormatException e) {
+			Log.e(this.LOG_TAG, "Error getting the number of the current comic "
+					+ e.toString());
 		}
     }
 
@@ -104,5 +105,50 @@ public class MainActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+    
+    public void showPrevious(View view){
+    	jsonParser = new JSONParser(this.getApplicationContext());
+    	try {
+			json = jsonParser.execute("http://xkcd.com/"+(currentComic-1)+
+					"/info.0.json").get();
+			extractJSONData(json);
+			printTheData();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    private void extractJSONData(JSONObject json) throws JSONException{
+    	comic = new Comic(json.getString(TAG_MONTH), json.getString(TAG_NUM),
+    			json.getString(TAG_LINK), json.getString(TAG_YEAR), 
+    			json.getString(TAG_NEWS), json.getString(TAG_SAFE_TITLE), 
+    			json.getString(TAG_TRANSCRIPT), json.getString(TAG_ALT), 
+    			json.getString(TAG_IMG), json.getString(TAG_TITLE), 
+    			json.getString(TAG_DAY));
+    }
+    
+    private void printTheData() throws MalformedURLException, IOException,
+    													NumberFormatException{
+    	// Get the current number of the comic
+    	currentComic = Integer.parseInt(comic.getNum());
+    	url = new URL(comic.getImg());
+    	Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+    	image.setImageBitmap(bmp);
+    	title.setText(comic.getTitle());
     }
 }
