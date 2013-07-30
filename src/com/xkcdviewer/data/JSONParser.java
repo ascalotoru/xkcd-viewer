@@ -84,9 +84,17 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>{
 
 	@Override
 	protected void onPreExecute() {
-		Toast.makeText(mContext, "Recibiendo datos...",
-				Toast.LENGTH_SHORT).show();
+		MainActivity.pDialog.show();
 	}
-	
-	
+
+	@Override
+	protected void onPostExecute(JSONObject result) {
+		MainActivity.pDialog.dismiss();		
+	}
+
+	@Override
+	protected void onProgressUpdate(Void... values) {
+		int progreso = Integer.parseInt(String.valueOf(values[0]));
+		MainActivity.pDialog.setProgress(progreso);
+	}
 }
