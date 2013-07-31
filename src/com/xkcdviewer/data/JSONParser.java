@@ -21,7 +21,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-public class JSONParser extends AsyncTask<String, Void, JSONObject>{
+public class JSONParser extends AsyncTask<String, Integer, JSONObject>{
 
 	static InputStream is = null;
 	static JSONObject jObj = null;
@@ -93,8 +93,8 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>{
 	}
 
 	@Override
-	protected void onProgressUpdate(Void... values) {
-		int progreso = Integer.parseInt(String.valueOf(values[0]));
+	protected void onProgressUpdate(Integer... values) {
+		int progreso = values[0].intValue();
 		MainActivity.pDialog.setProgress(progreso);
 	}
 }
