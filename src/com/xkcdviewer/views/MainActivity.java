@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import com.ascalotoru.xkcd.R;
 import com.xkcdviewer.data.Comic;
+import com.xkcdviewer.data.Image;
 import com.xkcdviewer.data.JSONParser;
 
 import android.os.Bundle;
@@ -101,6 +102,12 @@ public class MainActivity extends Activity implements OnGestureListener{
 		} catch (NumberFormatException e) {
 			Log.e(this.LOG_TAG, "Error getting the number of the current comic "
 					+ e.toString());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
     }
 
@@ -147,12 +154,12 @@ public class MainActivity extends Activity implements OnGestureListener{
     }
     
     private void printTheData() throws MalformedURLException, IOException,
-    													NumberFormatException{
+    						NumberFormatException, InterruptedException, 
+    						ExecutionException{
     	// Get the current number of the comic
     	currentComic = Integer.parseInt(comic.getNum());
-    	url = new URL(comic.getImg());
-    	Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-    	image.setImageBitmap(bmp);
+    	Image img = new Image();
+    	image.setImageBitmap(img.execute(comic).get());
     	title.setText(comic.getTitle());
     }
 
