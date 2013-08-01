@@ -14,15 +14,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.xkcdviewer.views.MainActivity;
-
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 public class JSONParser extends AsyncTask<String, Integer, JSONObject>{
 
+	private ProgressDialog pDialog;
 	static InputStream is = null;
 	static JSONObject jObj = null;
 	static String json = "";
@@ -30,7 +29,7 @@ public class JSONParser extends AsyncTask<String, Integer, JSONObject>{
 	private Context mContext;
 	
 	public JSONParser(Context context){
-		mContext = context;
+		this.mContext = context;
 	}
 	
 	public JSONObject getJSONFromUrl(String url){
@@ -84,17 +83,22 @@ public class JSONParser extends AsyncTask<String, Integer, JSONObject>{
 
 	@Override
 	protected void onPreExecute() {
-		MainActivity.pDialog.show();
+		pDialog = new ProgressDialog(mContext);
+		pDialog.setMessage("Loading...");
+		pDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+		pDialog.setIndeterminate(true);
+		pDialog.setCancelable(false);
+		pDialog.show();
 	}
 
 	@Override
 	protected void onPostExecute(JSONObject result) {
-		MainActivity.pDialog.dismiss();		
+		pDialog.dismiss();		
 	}
 
 	@Override
 	protected void onProgressUpdate(Integer... values) {
 		int progreso = values[0].intValue();
-		MainActivity.pDialog.setProgress(progreso);
+		pDialog.setProgress(progreso);
 	}
 }
